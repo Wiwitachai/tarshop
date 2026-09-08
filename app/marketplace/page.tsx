@@ -24,7 +24,6 @@ interface Product {
   image: string;
   description: string;
 }
-
 const initialProducts: Product[] = [
   {
     id: 1,
@@ -32,8 +31,9 @@ const initialProducts: Product[] = [
     category: "เสื้อยืด",
     price: 290,
     status: "มีสินค้าพร้อมส่ง",
+    // เปลี่ยน URL รูปด้านล่างนี้
     image:
-      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80",
+      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500&q=80",
     description: "เสื้อยืดคอตตอน 100% ผ้านุ่ม ใส่สบาย ทรง Oversize สไตล์สตรีท",
   },
   {

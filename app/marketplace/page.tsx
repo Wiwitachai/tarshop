@@ -1,7 +1,11 @@
-"use client";
+'use client';
 
-import React from "react";
-import { useTheme } from "next-themes";
-import { Sun, Moon, Search, PlusCircle, Home, ShoppingBag, User } from "lucide-react";
+import * as React from 'react';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
-export default function MarketplacePage() {
+export function ThemeProvider({
+  children,
+  ...props
+}: React.ComponentProps<typeof NextThemesProvider>) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+}

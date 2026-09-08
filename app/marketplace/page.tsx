@@ -13,6 +13,9 @@ import {
   Trash2,
   CheckCircle2,
   Upload,
+  QrCode,
+  CreditCard,
+  Building2,
 } from "lucide-react";
 
 interface Product {
@@ -88,6 +91,9 @@ export default function MarketplacePage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isStockOpen, setIsStockOpen] = useState(false);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"qr" | "bank">("qr");
+  const [slipImage, setSlipImage] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
 
   const [newProduct, setNewProduct] = useState({
@@ -98,7 +104,6 @@ export default function MarketplacePage() {
     description: "",
   });
 
-  // เช็คธีมเมื่อโหลดหน้าเว็บครั้งแรก
   useEffect(() => {
     setMounted(true);
     const savedTheme = localStorage.getItem("theme");
@@ -114,7 +119,6 @@ export default function MarketplacePage() {
     }
   }, []);
 
-  // ฟังก์ชันสลับธีม กลางวัน / กลางคืน
   const toggleTheme = () => {
     if (isDarkMode) {
       document.documentElement.classList.remove("dark");
@@ -141,6 +145,17 @@ export default function MarketplacePage() {
           ...prev,
           image: reader.result as string,
         }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSlipUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSlipImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -179,6 +194,14 @@ export default function MarketplacePage() {
     0
   );
 
+  const handleConfirmPayment = () => {
+    setCart([]);
+    setIsPaymentOpen(false);
+    setIsCartOpen(false);
+    setSlipImage(null);
+    showToast("ชำระเงินเรียบร้อย! ระบบกำลังดำเนินการจัดส่ง");
+  };
+
   const handleAddProduct = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProduct.name || !newProduct.price) return;
@@ -214,8 +237,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-orange-50/50 dark:bg-[#18110c] text-stone-800 dark:text-[#f4eae0] font-sans pb-12 transition-colors duration-300">
-      
-      {/* Toast Notification */}
+      {/* Notification Toast */}
       {notification && (
         <div className="fixed top-20 right-4 z-50 bg-orange-600 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 animate-bounce text-sm font-medium">
           <CheckCircle2 className="w-4 h-4" />
@@ -223,7 +245,7 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {/* Top Navbar */}
+      {/* Header Navbar */}
       <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#231a14]/90 backdrop-blur-md border-b border-orange-100 dark:border-[#38271d] px-4 py-3 flex items-center justify-between shadow-sm transition-colors">
         <div className="flex items-center gap-2">
           <Shirt className="w-6 h-6 text-orange-600 dark:text-orange-500" />
@@ -238,7 +260,7 @@ export default function MarketplacePage() {
             className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-orange-50 dark:bg-[#2e2118] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#423023] hover:bg-orange-100 dark:hover:bg-[#38271d] transition-all"
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline font-medium">ระบบจัดการสต็อก</span>
+            <span className="hidden sm:inline font-medium">จัดการสต็อก</span>
           </button>
 
           <button
@@ -261,7 +283,6 @@ export default function MarketplacePage() {
             )}
           </button>
 
-          {/* ปุ่มกดสลับธีม กลางวัน/กลางคืน */}
           <button
             type="button"
             onClick={toggleTheme}
@@ -277,8 +298,8 @@ export default function MarketplacePage() {
         </div>
       </header>
 
+      {/* Main Content */}
       <div className="max-w-5xl mx-auto px-4 py-4 space-y-4">
-        {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3.5 top-3 w-4 h-4 text-orange-500" />
           <input
@@ -290,7 +311,6 @@ export default function MarketplacePage() {
           />
         </div>
 
-        {/* Categories Pills */}
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {categories.map((cat) => (
             <button
@@ -307,7 +327,6 @@ export default function MarketplacePage() {
           ))}
         </div>
 
-        {/* Product Cards Grid */}
         <main className="grid grid-cols-2 md:grid-cols-2 gap-4 pt-2">
           {filteredProducts.map((product) => (
             <div
@@ -456,20 +475,146 @@ export default function MarketplacePage() {
               <div className="border-t border-stone-200 dark:border-[#2e2118] pt-4 space-y-3">
                 <div className="flex justify-between text-base font-bold">
                   <span>ราคารวมทั้งหมด:</span>
-                  <span className="text-orange-600 dark:text-orange-500 text-xl font-extrabold">฿{cartTotal}</span>
+                  <span className="text-orange-600 dark:text-orange-500 text-xl font-extrabold">
+                    ฿{cartTotal}
+                  </span>
                 </div>
                 <button
-                  onClick={() => {
-                    setCart([]);
-                    setIsCartOpen(false);
-                    showToast("สั่งซื้อสินค้าสำเร็จ!");
-                  }}
-                  className="w-full py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-500 transition-all shadow-md"
+                  onClick={() => setIsPaymentOpen(true)}
+                  className="w-full py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-500 transition-all shadow-md flex items-center justify-center gap-2"
                 >
+                  <CreditCard className="w-5 h-5" />
                   ชำระเงิน
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal: ระบบชำระเงินแบบ QR Code PromptPay */}
+      {isPaymentOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#231a14] border border-orange-100 dark:border-[#38271d] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setIsPaymentOpen(false)}
+              className="absolute top-3 right-3 p-1 rounded-lg bg-stone-100 dark:bg-[#2e2118] text-stone-500 dark:text-stone-400 hover:text-orange-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center pb-2 border-b border-stone-100 dark:border-[#2e2118]">
+              <h2 className="text-lg font-bold text-orange-600 dark:text-orange-500 flex items-center justify-center gap-2">
+                <QrCode className="w-5 h-5" />
+                ชำระเงิน (PromptPay)
+              </h2>
+              <p className="text-xs text-stone-500 dark:text-stone-400">
+                ยอดที่ต้องชำระทั้งสิ้น
+              </p>
+              <p className="text-3xl font-black text-orange-600 dark:text-orange-400 mt-1">
+                ฿{cartTotal}
+              </p>
+            </div>
+
+            {/* เลือกช่องทางชำระเงิน */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setPaymentMethod("qr")}
+                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                  paymentMethod === "qr"
+                    ? "bg-orange-600 border-orange-600 text-white"
+                    : "bg-stone-50 dark:bg-[#2e2118] border-stone-200 dark:border-[#38271d] text-stone-600 dark:text-stone-300"
+                }`}
+              >
+                <QrCode className="w-4 h-4" />
+                QR PromptPay
+              </button>
+              <button
+                onClick={() => setPaymentMethod("bank")}
+                className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                  paymentMethod === "bank"
+                    ? "bg-orange-600 border-orange-600 text-white"
+                    : "bg-stone-50 dark:bg-[#2e2118] border-stone-200 dark:border-[#38271d] text-stone-600 dark:text-stone-300"
+                }`}
+              >
+                <Building2 className="w-4 h-4" />
+                โอนผ่านธนาคาร
+              </button>
+            </div>
+
+            {/* แสดง QR Code สแกนจ่าย */}
+            {paymentMethod === "qr" ? (
+              <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl border border-stone-200 shadow-inner text-center">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://promptpay.io/0812345678/${cartTotal}`}
+                  alt="PromptPay QR Code"
+                  className="w-44 h-44 object-contain"
+                />
+                <p className="text-xs font-semibold text-stone-700 mt-2">
+                  สแกนผ่านแอปธนาคารได้ทุกธนาคาร
+                </p>
+                <p className="text-[10px] text-stone-400">
+                  ชื่อบัญชี: ร้าน TarShop Apparel
+                </p>
+              </div>
+            ) : (
+              <div className="bg-orange-50/60 dark:bg-[#2e2118] p-4 rounded-xl border border-orange-100 dark:border-[#38271d] space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-stone-500">ธนาคาร:</span>
+                  <span className="font-bold">กสิกรไทย (KBANK)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-stone-500">เลขบัญชี:</span>
+                  <span className="font-bold text-orange-600 dark:text-orange-400">
+                    123-4-56789-0
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-stone-500">ชื่อบัญชี:</span>
+                  <span className="font-bold">บจก. ทาร์ช็อป แอพพาเรล</span>
+                </div>
+              </div>
+            )}
+
+            {/* อัปโหลดสลิป */}
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                แนบหลักฐานการโอนเงิน (สลิป)
+              </label>
+              <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-xl cursor-pointer bg-stone-50 dark:bg-[#2e2118] border-stone-300 dark:border-[#423023] hover:border-orange-500 transition-all relative overflow-hidden">
+                {slipImage ? (
+                  <img
+                    src={slipImage}
+                    alt="Slip Preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-stone-400">
+                    <Upload className="w-5 h-5 mb-1 text-orange-500" />
+                    <p className="text-xs">อัปโหลดสลิปชำระเงินที่นี่</p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSlipUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            <button
+              onClick={handleConfirmPayment}
+              disabled={!slipImage}
+              className={`w-full py-3 font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2 ${
+                slipImage
+                  ? "bg-orange-600 hover:bg-orange-500 text-white cursor-pointer"
+                  : "bg-stone-300 dark:bg-stone-800 text-stone-500 cursor-not-allowed"
+              }`}
+            >
+              <CheckCircle2 className="w-5 h-5" />
+              {slipImage ? "ยืนยันการชำระเงิน" : "กรุณาอัปโหลดสลิปโอนเงิน"}
+            </button>
           </div>
         </div>
       )}
@@ -479,7 +624,9 @@ export default function MarketplacePage() {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#231a14] border border-orange-100 dark:border-[#38271d] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-stone-200 dark:border-[#2e2118] pb-2">
-              <h2 className="text-lg font-bold text-orange-600 dark:text-orange-500">ลงขายเสื้อใหม่ 👕</h2>
+              <h2 className="text-lg font-bold text-orange-600 dark:text-orange-500">
+                ลงขายเสื้อใหม่ 👕
+              </h2>
               <button onClick={() => setIsAddModalOpen(false)}>
                 <X className="w-5 h-5" />
               </button>
@@ -508,11 +655,13 @@ export default function MarketplacePage() {
                     }
                     className="w-full p-2.5 rounded-lg bg-stone-50 dark:bg-[#2e2118] border border-stone-200 dark:border-[#38271d] focus:outline-none focus:border-orange-500"
                   >
-                    {categories.filter((c) => c !== "ทั้งหมด").map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
+                    {categories
+                      .filter((c) => c !== "ทั้งหมด")
+                      .map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
                   </select>
                 </div>
                 <div>
@@ -530,9 +679,10 @@ export default function MarketplacePage() {
                 </div>
               </div>
 
-              {/* อัปโหลดไฟล์รูปภาพ */}
               <div>
-                <label className="block text-xs font-medium mb-1">อัปโหลดรูปภาพสินค้า</label>
+                <label className="block text-xs font-medium mb-1">
+                  อัปโหลดรูปภาพสินค้า
+                </label>
                 <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer bg-stone-50 dark:bg-[#2e2118] border-stone-300 dark:border-[#423023] hover:border-orange-500 transition-all relative overflow-hidden">
                   {newProduct.image ? (
                     <img
@@ -578,7 +728,7 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {/* Modal: ระบบจัดการสต็อก */}
+      {/* Modal: สต็อกสินค้า */}
       {isStockOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#231a14] border border-orange-100 dark:border-[#38271d] rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
@@ -605,7 +755,9 @@ export default function MarketplacePage() {
                     />
                     <div>
                       <p className="text-xs font-semibold">{item.name}</p>
-                      <p className="text-[10px] text-orange-600 dark:text-orange-400 font-bold">฿{item.price}</p>
+                      <p className="text-[10px] text-orange-600 dark:text-orange-400 font-bold">
+                        ฿{item.price}
+                      </p>
                     </div>
                   </div>
                   <button

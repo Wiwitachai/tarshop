@@ -22,7 +22,10 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
+      onClick={() => {
+        document.documentElement.classList.toggle("dark");
+        setTheme(isDark ? "light" : "dark");
+      }}
       className="p-2 rounded-lg bg-orange-50 dark:bg-[#2e2118] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#423023] hover:bg-orange-100 dark:hover:bg-[#38271d] transition-all"
       aria-label="Toggle Theme"
     >

@@ -105,6 +105,7 @@ export default function MarketplacePage() {
     description: "",
   });
 
+  // โหลดค่าธีมเมื่อเริ่มต้นทำงาน
   useEffect(() => {
     setMounted(true);
     const savedTheme = localStorage.getItem("theme");
@@ -112,12 +113,25 @@ export default function MarketplacePage() {
     const shouldBeDark = savedTheme === "dark" || (!savedTheme && prefersDark);
 
     setIsDarkMode(shouldBeDark);
+    if (shouldBeDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   }, []);
 
+  // ฟังก์ชันสลับธีมเมื่อกดปุ่ม
   const toggleTheme = () => {
     const nextState = !isDarkMode;
     setIsDarkMode(nextState);
-    localStorage.setItem("theme", nextState ? "dark" : "light");
+    
+    if (nextState) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
   };
 
   const showToast = (msg: string) => {
@@ -230,7 +244,7 @@ export default function MarketplacePage() {
 
   return (
     <div className={isDarkMode ? "dark" : ""}>
-      <div className="min-h-screen bg-orange-50/50 dark:bg-[#0f0b08] text-stone-800 dark:text-[#f4eae0] font-sans pb-12 transition-colors duration-300">
+      <div className="min-h-screen bg-[#fdfbf7] dark:bg-[#0f0b08] text-stone-800 dark:text-[#f4eae0] font-sans pb-12 transition-colors duration-300">
         {/* Notification Toast */}
         {notification && (
           <div className="fixed top-20 right-4 z-50 bg-orange-600 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 animate-bounce text-sm font-medium">
@@ -240,10 +254,10 @@ export default function MarketplacePage() {
         )}
 
         {/* Header Navbar */}
-        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#1a120b]/90 backdrop-blur-md border-b border-orange-100 dark:border-[#2a1c12] px-4 py-3 flex items-center justify-between shadow-sm transition-colors">
+        <header className="sticky top-0 z-20 bg-[#fdfbf7]/90 dark:bg-[#1a120b]/90 backdrop-blur-md border-b border-orange-200/60 dark:border-[#2a1c12] px-4 py-3 flex items-center justify-between shadow-sm transition-colors">
           <div className="flex items-center gap-2">
             <Shirt className="w-6 h-6 text-orange-600 dark:text-orange-500" />
-            <h1 className="text-xl font-extrabold tracking-wide text-orange-600 dark:text-orange-500">
+            <h1 className="text-xl font-extrabold tracking-wide text-orange-600 dark:text-orange-500 font-serif">
               TarShop Apparel 👕
             </h1>
           </div>
@@ -251,7 +265,7 @@ export default function MarketplacePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsStockOpen(true)}
-              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-orange-50 dark:bg-[#261910] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#3d2719] hover:bg-orange-100 dark:hover:bg-[#342216] transition-all"
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-orange-100/50 dark:bg-[#261910] text-orange-900 dark:text-orange-300 border border-orange-200 dark:border-[#3d2719] hover:bg-orange-200/50 dark:hover:bg-[#342216] transition-all"
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span className="hidden sm:inline font-medium">จัดการสต็อก</span>
@@ -267,7 +281,7 @@ export default function MarketplacePage() {
 
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 rounded-lg bg-orange-50 dark:bg-[#261910] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#3d2719] hover:bg-orange-100 dark:hover:bg-[#342216]"
+              className="relative p-2 rounded-lg bg-orange-100/50 dark:bg-[#261910] text-orange-900 dark:text-orange-300 border border-orange-200 dark:border-[#3d2719] hover:bg-orange-200/50 dark:hover:bg-[#342216]"
             >
               <ShoppingCart className="w-4 h-4" />
               {cart.length > 0 && (
@@ -277,11 +291,11 @@ export default function MarketplacePage() {
               )}
             </button>
 
-            {/* ปุ่มสลับกลางวัน / กลางคืน */}
+            {/* ปุ่มกดสลับธีม กลางวัน/กลางคืน */}
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-orange-50 dark:bg-[#261910] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#3d2719] hover:bg-orange-100 dark:hover:bg-[#342216] transition-all cursor-pointer"
+              className="p-2 rounded-lg bg-orange-100/50 dark:bg-[#261910] text-orange-900 dark:text-orange-300 border border-orange-200 dark:border-[#3d2719] hover:bg-orange-200/50 dark:hover:bg-[#342216] transition-all cursor-pointer"
               title="สลับโหมดกลางวัน/กลางคืน"
             >
               {mounted && isDarkMode ? (
@@ -326,7 +340,7 @@ export default function MarketplacePage() {
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="bg-white dark:bg-[#1a120b] border border-orange-100 dark:border-[#2a1c12] rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-orange-300 dark:hover:border-orange-500/50 transition-all flex flex-col justify-between"
+                className="bg-white dark:bg-[#1a120b] border border-orange-200/60 dark:border-[#2a1c12] rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-orange-400 dark:hover:border-orange-500/50 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div
@@ -359,7 +373,7 @@ export default function MarketplacePage() {
                   </span>
                   <button
                     onClick={() => setSelectedProduct(product)}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-orange-50 dark:bg-[#261910] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#3d2719] hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white transition-all font-medium"
+                    className="text-xs px-3 py-1.5 rounded-lg bg-orange-100/50 dark:bg-[#261910] text-orange-900 dark:text-orange-300 border border-orange-200 dark:border-[#3d2719] hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white transition-all font-medium"
                   >
                     :: เลือกดูสินค้า
                   </button>
@@ -372,7 +386,7 @@ export default function MarketplacePage() {
         {/* Modal: รายละเอียดสินค้า */}
         {selectedProduct && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#1a120b] border border-orange-100 dark:border-[#2a1c12] rounded-2xl max-w-md w-full p-5 relative space-y-4 shadow-2xl">
+            <div className="bg-white dark:bg-[#1a120b] border border-orange-200/60 dark:border-[#2a1c12] rounded-2xl max-w-md w-full p-5 relative space-y-4 shadow-2xl">
               <button
                 onClick={() => setSelectedProduct(null)}
                 className="absolute top-3 right-3 p-1 rounded-lg bg-stone-100 dark:bg-[#261910] text-stone-500 dark:text-stone-400 hover:text-orange-600"
@@ -385,7 +399,7 @@ export default function MarketplacePage() {
                 className="w-full h-60 object-cover rounded-xl"
               />
               <div>
-                <span className="text-xs px-2.5 py-1 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-400 font-medium">
+                <span className="text-xs px-2.5 py-1 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-400 font-medium">
                   {selectedProduct.category}
                 </span>
                 <h2 className="text-lg font-bold mt-2 text-stone-900 dark:text-stone-100">
@@ -415,7 +429,7 @@ export default function MarketplacePage() {
         {/* Drawer: ตะกร้าสินค้า */}
         {isCartOpen && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-end">
-            <div className="bg-white dark:bg-[#1a120b] border-l border-orange-100 dark:border-[#2a1c12] w-full max-w-md h-full p-5 flex flex-col justify-between shadow-2xl">
+            <div className="bg-white dark:bg-[#1a120b] border-l border-orange-200/60 dark:border-[#2a1c12] w-full max-w-md h-full p-5 flex flex-col justify-between shadow-2xl">
               <div>
                 <div className="flex items-center justify-between border-b border-stone-200 dark:border-[#261910] pb-3">
                   <h2 className="text-lg font-bold flex items-center gap-2 text-orange-600 dark:text-orange-500">
@@ -439,7 +453,7 @@ export default function MarketplacePage() {
                     cart.map((item) => (
                       <div
                         key={item.product.id}
-                        className="flex items-center justify-between bg-orange-50/50 dark:bg-[#261910] p-3 rounded-xl border border-orange-100 dark:border-[#3d2719]"
+                        className="flex items-center justify-between bg-orange-50/50 dark:bg-[#261910] p-3 rounded-xl border border-orange-200/60 dark:border-[#3d2719]"
                       >
                         <div className="flex items-center gap-3">
                           <img
@@ -492,7 +506,7 @@ export default function MarketplacePage() {
         {/* Modal: ระบบชำระเงิน */}
         {isPaymentOpen && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#1a120b] border border-orange-100 dark:border-[#2a1c12] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-[#1a120b] border border-orange-200/60 dark:border-[#2a1c12] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => setIsPaymentOpen(false)}
                 className="absolute top-3 right-3 p-1 rounded-lg bg-stone-100 dark:bg-[#261910] text-stone-500 dark:text-stone-400 hover:text-orange-600"
@@ -513,7 +527,6 @@ export default function MarketplacePage() {
                 </p>
               </div>
 
-              {/* ปุ่มเลือกช่องทางชำระเงิน */}
               <div className="grid grid-cols-3 gap-1.5">
                 <button
                   onClick={() => setPaymentMethod("qr")}
@@ -550,7 +563,6 @@ export default function MarketplacePage() {
                 </button>
               </div>
 
-              {/* แสดงรายละเอียดตามการเลือก */}
               {paymentMethod === "qr" && (
                 <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl border border-stone-200 shadow-inner text-center">
                   <img
@@ -598,7 +610,6 @@ export default function MarketplacePage() {
                 </div>
               )}
 
-              {/* ส่วนแนบสลิป */}
               {paymentMethod !== "cash" && (
                 <div>
                   <label className="block text-xs font-medium mb-1">
@@ -650,7 +661,7 @@ export default function MarketplacePage() {
         {/* Modal: ลงขายเสื้อใหม่ */}
         {isAddModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#1a120b] border border-orange-100 dark:border-[#2a1c12] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div className="bg-white dark:bg-[#1a120b] border border-orange-200/60 dark:border-[#2a1c12] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
               <div className="flex items-center justify-between border-b border-stone-200 dark:border-[#261910] pb-2">
                 <h2 className="text-lg font-bold text-orange-600 dark:text-orange-500">
                   ลงขายเสื้อใหม่ 👕
@@ -759,7 +770,7 @@ export default function MarketplacePage() {
         {/* Modal: สต็อกสินค้า */}
         {isStockOpen && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#1a120b] border border-orange-100 dark:border-[#2a1c12] rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div className="bg-white dark:bg-[#1a120b] border border-orange-200/60 dark:border-[#2a1c12] rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
               <div className="flex items-center justify-between border-b border-stone-200 dark:border-[#261910] pb-2">
                 <h2 className="text-lg font-bold flex items-center gap-2 text-orange-600 dark:text-orange-500">
                   <LayoutDashboard className="w-5 h-5" />

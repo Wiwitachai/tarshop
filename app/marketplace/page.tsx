@@ -1,10 +1,7 @@
 "use client";
-
+import { ThemeToggle } from "@/components/theme-provider";
 import React, { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
 import {
-  Sun,
-  Moon,
   Search,
   Shirt,
   ShoppingCart,
@@ -78,8 +75,6 @@ const categories = [
 ];
 
 export default function MarketplacePage() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [activeCategory, setActiveCategory] = useState("ทั้งหมด");
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,10 +93,6 @@ export default function MarketplacePage() {
     image: "",
     description: "",
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const showToast = (msg: string) => {
     setNotification(msg);
@@ -237,12 +228,7 @@ export default function MarketplacePage() {
             )}
           </button>
 
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg bg-orange-50 dark:bg-[#2e2118] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#423023] hover:bg-orange-100 dark:hover:bg-[#38271d]"
-          >
-            {mounted && (theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-orange-600" />)}
-          </button>
+          <ThemeToggle />
         </div>
       </header>
 

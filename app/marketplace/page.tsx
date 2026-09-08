@@ -1,7 +1,9 @@
 "use client";
-import { ThemeToggle } from "@/components/theme-provider";
+
 import React, { useState, useEffect } from "react";
 import {
+  Sun,
+  Moon,
   Search,
   Shirt,
   ShoppingCart,
@@ -75,6 +77,8 @@ const categories = [
 ];
 
 export default function MarketplacePage() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [activeCategory, setActiveCategory] = useState("ทั้งหมด");
   const [searchQuery, setSearchQuery] = useState("");
@@ -93,6 +97,35 @@ export default function MarketplacePage() {
     image: "",
     description: "",
   });
+
+  // เช็คธีมเมื่อโหลดหน้าเว็บครั้งแรก
+  useEffect(() => {
+    setMounted(true);
+    const savedTheme = localStorage.getItem("theme");
+    const isDark =
+      savedTheme === "dark" ||
+      (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+    setIsDarkMode(isDark);
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  // ฟังก์ชันสลับธีม กลางวัน / กลางคืน
+  const toggleTheme = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setIsDarkMode(true);
+    }
+  };
 
   const showToast = (msg: string) => {
     setNotification(msg);
@@ -180,7 +213,7 @@ export default function MarketplacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50/40 dark:bg-[#18110c] text-stone-800 dark:text-[#f4eae0] font-sans pb-12 transition-colors duration-300">
+    <div className="min-h-screen bg-orange-50/50 dark:bg-[#18110c] text-stone-800 dark:text-[#f4eae0] font-sans pb-12 transition-colors duration-300">
       
       {/* Toast Notification */}
       {notification && (
@@ -228,7 +261,19 @@ export default function MarketplacePage() {
             )}
           </button>
 
-          <ThemeToggle />
+          {/* ปุ่มกดสลับธีม กลางวัน/กลางคืน */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-2 rounded-lg bg-orange-50 dark:bg-[#2e2118] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#423023] hover:bg-orange-100 dark:hover:bg-[#38271d] transition-all cursor-pointer"
+            title="สลับโหมดกลางวัน/กลางคืน"
+          >
+            {mounted && isDarkMode ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-orange-600" />
+            )}
+          </button>
         </div>
       </header>
 

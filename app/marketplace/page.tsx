@@ -24,6 +24,7 @@ interface Product {
   image: string;
   description: string;
 }
+
 const initialProducts: Product[] = [
   {
     id: 1,
@@ -31,7 +32,6 @@ const initialProducts: Product[] = [
     category: "เสื้อยืด",
     price: 290,
     status: "มีสินค้าพร้อมส่ง",
-    // เปลี่ยน URL รูปด้านล่างนี้
     image:
       "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500&q=80",
     description: "เสื้อยืดคอตตอน 100% ผ้านุ่ม ใส่สบาย ทรง Oversize สไตล์สตรีท",
@@ -82,7 +82,6 @@ export default function MarketplacePage() {
   const [activeCategory, setActiveCategory] = useState("ทั้งหมด");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Modals & Drawers States
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<{ product: Product; quantity: number }[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -90,7 +89,6 @@ export default function MarketplacePage() {
   const [isStockOpen, setIsStockOpen] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
 
-  // New Product Form State
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "เสื้อยืด",
@@ -99,13 +97,11 @@ export default function MarketplacePage() {
     description: "",
   });
 
-  // Notifications
   const showToast = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Filter Products
   const filteredProducts = products.filter((p) => {
     const matchCategory =
       activeCategory === "ทั้งหมด" || p.category === activeCategory;
@@ -115,7 +111,6 @@ export default function MarketplacePage() {
     return matchCategory && matchSearch;
   });
 
-  // Cart Functions
   const addToCart = (product: Product) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
@@ -140,7 +135,6 @@ export default function MarketplacePage() {
     0
   );
 
-  // Add Product Function
   const handleAddProduct = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProduct.name || !newProduct.price) return;
@@ -153,7 +147,7 @@ export default function MarketplacePage() {
       status: "มีสินค้าพร้อมส่ง",
       image:
         newProduct.image ||
-        "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80",
+        "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500&q=80",
       description: newProduct.description || "ไม่มีรายละเอียดเพิ่มเติม",
     };
 
@@ -169,7 +163,6 @@ export default function MarketplacePage() {
     showToast("ลงขายเสื้อใหม่สำเร็จแล้ว!");
   };
 
-  // Delete Product Function
   const handleDeleteProduct = (id: number) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
     showToast("ลบรายการสินค้าเรียบร้อย");
@@ -178,7 +171,6 @@ export default function MarketplacePage() {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-[#120e0c] text-slate-900 dark:text-[#f5e6d3] font-sans pb-12 transition-colors duration-300">
       
-      {/* Toast Notification */}
       {notification && (
         <div className="fixed top-20 right-4 z-50 bg-amber-600 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 animate-bounce text-sm font-medium">
           <CheckCircle2 className="w-4 h-4" />
@@ -186,7 +178,6 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {/* Top Navbar */}
       <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#1e1713]/90 backdrop-blur-md border-b border-slate-200 dark:border-[#382b22] px-4 py-3 flex items-center justify-between shadow-sm transition-colors">
         <div className="flex items-center gap-2">
           <Shirt className="w-6 h-6 text-amber-600 dark:text-amber-500" />
@@ -238,7 +229,6 @@ export default function MarketplacePage() {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-4 space-y-4">
-        {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3.5 top-3 w-4 h-4 text-amber-600" />
           <input
@@ -250,7 +240,6 @@ export default function MarketplacePage() {
           />
         </div>
 
-        {/* Categories Pills */}
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {categories.map((cat) => (
             <button
@@ -267,7 +256,6 @@ export default function MarketplacePage() {
           ))}
         </div>
 
-        {/* Product Cards Grid */}
         <main className="grid grid-cols-2 md:grid-cols-2 gap-4 pt-2">
           {filteredProducts.map((product) => (
             <div
@@ -315,7 +303,6 @@ export default function MarketplacePage() {
         </main>
       </div>
 
-      {/* Modal: รายละเอียดสินค้า */}
       {selectedProduct && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#1e1713] border border-slate-200 dark:border-[#382b22] rounded-2xl max-w-md w-full p-5 relative space-y-4">
@@ -356,7 +343,6 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {/* Drawer: ตะกร้าสินค้า */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end">
           <div className="bg-white dark:bg-[#1e1713] border-l border-slate-200 dark:border-[#382b22] w-full max-w-md h-full p-5 flex flex-col justify-between">
@@ -434,7 +420,6 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {/* Modal: เพิ่มเสื้อใหม่ */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#1e1713] border border-slate-200 dark:border-[#382b22] rounded-2xl max-w-md w-full p-5 space-y-4">
@@ -523,7 +508,6 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      {/* Modal: ระบบจัดการสต็อก */}
       {isStockOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#1e1713] border border-slate-200 dark:border-[#382b22] rounded-2xl max-w-lg w-full p-5 space-y-4">

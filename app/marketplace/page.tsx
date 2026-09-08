@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import {
   Sun,
@@ -13,6 +13,7 @@ import {
   X,
   Trash2,
   CheckCircle2,
+  Upload,
 } from "lucide-react";
 
 interface Product {
@@ -78,6 +79,7 @@ const categories = [
 
 export default function MarketplacePage() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [activeCategory, setActiveCategory] = useState("ทั้งหมด");
   const [searchQuery, setSearchQuery] = useState("");
@@ -97,9 +99,27 @@ export default function MarketplacePage() {
     description: "",
   });
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const showToast = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewProduct((prev) => ({
+          ...prev,
+          image: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const filteredProducts = products.filter((p) => {
@@ -169,19 +189,21 @@ export default function MarketplacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-[#120e0c] text-slate-900 dark:text-[#f5e6d3] font-sans pb-12 transition-colors duration-300">
+    <div className="min-h-screen bg-orange-50/40 dark:bg-[#18110c] text-stone-800 dark:text-[#f4eae0] font-sans pb-12 transition-colors duration-300">
       
+      {/* Toast Notification */}
       {notification && (
-        <div className="fixed top-20 right-4 z-50 bg-amber-600 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 animate-bounce text-sm font-medium">
+        <div className="fixed top-20 right-4 z-50 bg-orange-600 text-white px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 animate-bounce text-sm font-medium">
           <CheckCircle2 className="w-4 h-4" />
           <span>{notification}</span>
         </div>
       )}
 
-      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#1e1713]/90 backdrop-blur-md border-b border-slate-200 dark:border-[#382b22] px-4 py-3 flex items-center justify-between shadow-sm transition-colors">
+      {/* Top Navbar */}
+      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#231a14]/90 backdrop-blur-md border-b border-orange-100 dark:border-[#38271d] px-4 py-3 flex items-center justify-between shadow-sm transition-colors">
         <div className="flex items-center gap-2">
-          <Shirt className="w-6 h-6 text-amber-600 dark:text-amber-500" />
-          <h1 className="text-xl font-bold tracking-wide text-amber-600 dark:text-amber-500">
+          <Shirt className="w-6 h-6 text-orange-600 dark:text-orange-500" />
+          <h1 className="text-xl font-extrabold tracking-wide text-orange-600 dark:text-orange-500">
             TarShop Apparel 👕
           </h1>
         </div>
@@ -189,15 +211,15 @@ export default function MarketplacePage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsStockOpen(true)}
-            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a201a] text-amber-700 dark:text-amber-400 border border-slate-300 dark:border-[#423328] hover:bg-slate-200 dark:hover:bg-[#382b22] transition-all"
+            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-orange-50 dark:bg-[#2e2118] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#423023] hover:bg-orange-100 dark:hover:bg-[#38271d] transition-all"
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">ระบบจัดการสต็อก</span>
+            <span className="hidden sm:inline font-medium">ระบบจัดการสต็อก</span>
           </button>
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-500 transition-all shadow-sm"
+            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white font-medium hover:bg-orange-500 transition-all shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>เสื้อใหม่</span>
@@ -205,11 +227,11 @@ export default function MarketplacePage() {
 
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative p-2 rounded-lg bg-slate-100 dark:bg-[#2a201a] text-amber-700 dark:text-amber-400 border border-slate-300 dark:border-[#423328] hover:bg-slate-200 dark:hover:bg-[#382b22]"
+            className="relative p-2 rounded-lg bg-orange-50 dark:bg-[#2e2118] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#423023] hover:bg-orange-100 dark:hover:bg-[#38271d]"
           >
             <ShoppingCart className="w-4 h-4" />
             {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-600 text-white text-[10px] rounded-full flex items-center justify-center font-bold">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-600 text-white text-[10px] rounded-full flex items-center justify-center font-bold">
                 {cart.reduce((a, b) => a + b.quantity, 0)}
               </span>
             )}
@@ -217,29 +239,27 @@ export default function MarketplacePage() {
 
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg bg-slate-100 dark:bg-[#2a201a] text-amber-700 dark:text-amber-400 border border-slate-300 dark:border-[#423328] hover:bg-slate-200 dark:hover:bg-[#382b22]"
+            className="p-2 rounded-lg bg-orange-50 dark:bg-[#2e2118] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#423023] hover:bg-orange-100 dark:hover:bg-[#38271d]"
           >
-            {theme === "dark" ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
+            {mounted && (theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-orange-600" />)}
           </button>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-4 space-y-4">
+        {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3.5 top-3 w-4 h-4 text-amber-600" />
+          <Search className="absolute left-3.5 top-3 w-4 h-4 text-orange-500" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="ค้นหาเสื้อผ้า, ไซส์, หมวดหมู่..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-[#1e1713] border border-slate-200 dark:border-[#382b22] focus:outline-none focus:border-amber-500 text-sm placeholder-slate-400 dark:placeholder-[#8c7361] shadow-inner"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-[#231a14] border border-orange-200/80 dark:border-[#38271d] focus:outline-none focus:border-orange-500 text-sm placeholder-stone-400 dark:placeholder-stone-500 shadow-sm"
           />
         </div>
 
+        {/* Categories Pills */}
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {categories.map((cat) => (
             <button
@@ -247,8 +267,8 @@ export default function MarketplacePage() {
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap border transition-all ${
                 activeCategory === cat
-                  ? "bg-amber-600 border-amber-500 text-white shadow-md"
-                  : "bg-white dark:bg-[#1e1713] border-slate-200 dark:border-[#382b22] text-slate-600 dark:text-[#c4ad9d] hover:bg-slate-100 dark:hover:bg-[#2a201a]"
+                  ? "bg-orange-600 border-orange-600 text-white shadow-sm"
+                  : "bg-white dark:bg-[#231a14] border-orange-200/60 dark:border-[#38271d] text-stone-600 dark:text-stone-300 hover:bg-orange-50 dark:hover:bg-[#2e2118]"
               }`}
             >
               :: {cat}
@@ -256,23 +276,24 @@ export default function MarketplacePage() {
           ))}
         </div>
 
+        {/* Product Cards Grid */}
         <main className="grid grid-cols-2 md:grid-cols-2 gap-4 pt-2">
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="bg-white dark:bg-[#1e1713] border border-slate-200 dark:border-[#382b22] rounded-2xl overflow-hidden shadow-sm hover:border-amber-500/50 transition-all flex flex-col justify-between"
+              className="bg-white dark:bg-[#231a14] border border-orange-100 dark:border-[#38271d] rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-orange-300 dark:hover:border-orange-500/50 transition-all flex flex-col justify-between"
             >
               <div>
                 <div
                   onClick={() => setSelectedProduct(product)}
-                  className="relative w-full h-56 md:h-72 bg-slate-100 dark:bg-[#120e0c] overflow-hidden group cursor-pointer"
+                  className="relative w-full h-56 md:h-72 bg-stone-100 dark:bg-[#18110c] overflow-hidden group cursor-pointer"
                 >
                   <img
                     src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <span className="absolute top-2 right-2 text-[10px] bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10 text-amber-400">
+                  <span className="absolute top-2 right-2 text-[10px] bg-stone-900/70 text-orange-300 backdrop-blur-md px-2.5 py-0.5 rounded-md font-medium border border-white/10">
                     {product.category}
                   </span>
                 </div>
@@ -280,20 +301,20 @@ export default function MarketplacePage() {
                 <div className="p-3">
                   <h3
                     onClick={() => setSelectedProduct(product)}
-                    className="font-semibold text-sm line-clamp-1 hover:text-amber-500 cursor-pointer"
+                    className="font-semibold text-sm line-clamp-1 hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer"
                   >
                     {product.name}
                   </h3>
                 </div>
               </div>
 
-              <div className="p-3 pt-0 flex items-center justify-between border-t border-slate-100 dark:border-[#2a201a] mt-2">
-                <span className="text-amber-600 dark:text-amber-500 font-bold text-base">
+              <div className="p-3 pt-0 flex items-center justify-between border-t border-stone-100 dark:border-[#2e2118] mt-2">
+                <span className="text-orange-600 dark:text-orange-500 font-extrabold text-base">
                   ฿{product.price}
                 </span>
                 <button
                   onClick={() => setSelectedProduct(product)}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a201a] text-amber-700 dark:text-amber-400 border border-slate-200 dark:border-[#423328] hover:bg-amber-600 hover:text-white dark:hover:bg-amber-600 dark:hover:text-white transition-all"
+                  className="text-xs px-3 py-1.5 rounded-lg bg-orange-50 dark:bg-[#2e2118] text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-[#423023] hover:bg-orange-600 hover:text-white dark:hover:bg-orange-600 dark:hover:text-white transition-all font-medium"
                 >
                   :: เลือกดูสินค้า
                 </button>
@@ -303,12 +324,13 @@ export default function MarketplacePage() {
         </main>
       </div>
 
+      {/* Modal: รายละเอียดสินค้า */}
       {selectedProduct && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1e1713] border border-slate-200 dark:border-[#382b22] rounded-2xl max-w-md w-full p-5 relative space-y-4">
+          <div className="bg-white dark:bg-[#231a14] border border-orange-100 dark:border-[#38271d] rounded-2xl max-w-md w-full p-5 relative space-y-4 shadow-2xl">
             <button
               onClick={() => setSelectedProduct(null)}
-              className="absolute top-3 right-3 p-1 rounded-lg bg-slate-100 dark:bg-[#2a201a] text-slate-500 dark:text-slate-400"
+              className="absolute top-3 right-3 p-1 rounded-lg bg-stone-100 dark:bg-[#2e2118] text-stone-500 dark:text-stone-400 hover:text-orange-600"
             >
               <X className="w-5 h-5" />
             </button>
@@ -318,14 +340,14 @@ export default function MarketplacePage() {
               className="w-full h-60 object-cover rounded-xl"
             />
             <div>
-              <span className="text-xs px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 font-medium">
+              <span className="text-xs px-2.5 py-1 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-400 font-medium">
                 {selectedProduct.category}
               </span>
               <h2 className="text-lg font-bold mt-2">{selectedProduct.name}</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
                 {selectedProduct.description}
               </p>
-              <p className="text-xl font-extrabold text-amber-600 dark:text-amber-500 mt-3">
+              <p className="text-2xl font-black text-orange-600 dark:text-orange-500 mt-3">
                 ฿{selectedProduct.price}
               </p>
             </div>
@@ -334,7 +356,7 @@ export default function MarketplacePage() {
                 addToCart(selectedProduct);
                 setSelectedProduct(null);
               }}
-              className="w-full py-3 rounded-xl bg-amber-600 text-white font-semibold hover:bg-amber-500 transition-all shadow-md flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-orange-600 text-white font-semibold hover:bg-orange-500 transition-all shadow-md flex items-center justify-center gap-2"
             >
               <ShoppingCart className="w-4 h-4" />
               เพิ่มลงตะกร้าสินค้า
@@ -343,18 +365,19 @@ export default function MarketplacePage() {
         </div>
       )}
 
+      {/* Drawer: ตะกร้าสินค้า */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end">
-          <div className="bg-white dark:bg-[#1e1713] border-l border-slate-200 dark:border-[#382b22] w-full max-w-md h-full p-5 flex flex-col justify-between">
+          <div className="bg-white dark:bg-[#231a14] border-l border-orange-100 dark:border-[#38271d] w-full max-w-md h-full p-5 flex flex-col justify-between shadow-2xl">
             <div>
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#2a201a] pb-3">
-                <h2 className="text-lg font-bold flex items-center gap-2">
-                  <ShoppingCart className="w-5 h-5 text-amber-500" />
+              <div className="flex items-center justify-between border-b border-stone-200 dark:border-[#2e2118] pb-3">
+                <h2 className="text-lg font-bold flex items-center gap-2 text-orange-600 dark:text-orange-500">
+                  <ShoppingCart className="w-5 h-5" />
                   ตะกร้าสินค้า
                 </h2>
                 <button
                   onClick={() => setIsCartOpen(false)}
-                  className="p-1 rounded-lg bg-slate-100 dark:bg-[#2a201a]"
+                  className="p-1 rounded-lg bg-stone-100 dark:bg-[#2e2118]"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -362,14 +385,14 @@ export default function MarketplacePage() {
 
               <div className="mt-4 space-y-3 max-h-[60vh] overflow-y-auto">
                 {cart.length === 0 ? (
-                  <p className="text-center text-sm text-slate-400 py-8">
+                  <p className="text-center text-sm text-stone-400 py-8">
                     ยังไม่มีสินค้าในตะกร้า
                   </p>
                 ) : (
                   cart.map((item) => (
                     <div
                       key={item.product.id}
-                      className="flex items-center justify-between bg-slate-50 dark:bg-[#2a201a] p-3 rounded-xl border border-slate-200 dark:border-[#382b22]"
+                      className="flex items-center justify-between bg-orange-50/50 dark:bg-[#2e2118] p-3 rounded-xl border border-orange-100 dark:border-[#38271d]"
                     >
                       <div className="flex items-center gap-3">
                         <img
@@ -381,14 +404,14 @@ export default function MarketplacePage() {
                           <p className="text-sm font-medium line-clamp-1">
                             {item.product.name}
                           </p>
-                          <p className="text-xs text-amber-500 font-bold">
+                          <p className="text-xs text-orange-600 dark:text-orange-400 font-bold">
                             ฿{item.product.price} x {item.quantity}
                           </p>
                         </div>
                       </div>
                       <button
                         onClick={() => removeFromCart(item.product.id)}
-                        className="text-red-500 hover:text-red-400 p-1"
+                        className="text-red-500 hover:text-red-600 p-1"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -399,10 +422,10 @@ export default function MarketplacePage() {
             </div>
 
             {cart.length > 0 && (
-              <div className="border-t border-slate-200 dark:border-[#2a201a] pt-4 space-y-3">
+              <div className="border-t border-stone-200 dark:border-[#2e2118] pt-4 space-y-3">
                 <div className="flex justify-between text-base font-bold">
                   <span>ราคารวมทั้งหมด:</span>
-                  <span className="text-amber-500">฿{cartTotal}</span>
+                  <span className="text-orange-600 dark:text-orange-500 text-xl font-extrabold">฿{cartTotal}</span>
                 </div>
                 <button
                   onClick={() => {
@@ -410,7 +433,7 @@ export default function MarketplacePage() {
                     setIsCartOpen(false);
                     showToast("สั่งซื้อสินค้าสำเร็จ!");
                   }}
-                  className="w-full py-3 bg-amber-600 text-white font-semibold rounded-xl hover:bg-amber-500 transition-all shadow-md"
+                  className="w-full py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-500 transition-all shadow-md"
                 >
                   ชำระเงิน
                 </button>
@@ -420,18 +443,19 @@ export default function MarketplacePage() {
         </div>
       )}
 
+      {/* Modal: ลงขายเสื้อใหม่ */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1e1713] border border-slate-200 dark:border-[#382b22] rounded-2xl max-w-md w-full p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#2a201a] pb-2">
-              <h2 className="text-lg font-bold">ลงขายเสื้อใหม่ 👕</h2>
+          <div className="bg-white dark:bg-[#231a14] border border-orange-100 dark:border-[#38271d] rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-stone-200 dark:border-[#2e2118] pb-2">
+              <h2 className="text-lg font-bold text-orange-600 dark:text-orange-500">ลงขายเสื้อใหม่ 👕</h2>
               <button onClick={() => setIsAddModalOpen(false)}>
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleAddProduct} className="space-y-3 text-sm">
               <div>
-                <label className="block text-xs mb-1">ชื่อสินค้า</label>
+                <label className="block text-xs font-medium mb-1">ชื่อสินค้า</label>
                 <input
                   type="text"
                   required
@@ -439,19 +463,19 @@ export default function MarketplacePage() {
                   onChange={(e) =>
                     setNewProduct({ ...newProduct, name: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-[#2a201a] border border-slate-200 dark:border-[#382b22] focus:outline-none focus:border-amber-500"
+                  className="w-full p-2.5 rounded-lg bg-stone-50 dark:bg-[#2e2118] border border-stone-200 dark:border-[#38271d] focus:outline-none focus:border-orange-500"
                   placeholder="เช่น เสื้อเชิ้ตสีขาว"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs mb-1">หมวดหมู่</label>
+                  <label className="block text-xs font-medium mb-1">หมวดหมู่</label>
                   <select
                     value={newProduct.category}
                     onChange={(e) =>
                       setNewProduct({ ...newProduct, category: e.target.value })
                     }
-                    className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-[#2a201a] border border-slate-200 dark:border-[#382b22] focus:outline-none focus:border-amber-500"
+                    className="w-full p-2.5 rounded-lg bg-stone-50 dark:bg-[#2e2118] border border-stone-200 dark:border-[#38271d] focus:outline-none focus:border-orange-500"
                   >
                     {categories.filter((c) => c !== "ทั้งหมด").map((c) => (
                       <option key={c} value={c}>
@@ -461,7 +485,7 @@ export default function MarketplacePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs mb-1">ราคา (บาท)</label>
+                  <label className="block text-xs font-medium mb-1">ราคา (บาท)</label>
                   <input
                     type="number"
                     required
@@ -469,37 +493,52 @@ export default function MarketplacePage() {
                     onChange={(e) =>
                       setNewProduct({ ...newProduct, price: e.target.value })
                     }
-                    className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-[#2a201a] border border-slate-200 dark:border-[#382b22] focus:outline-none focus:border-amber-500"
+                    className="w-full p-2.5 rounded-lg bg-stone-50 dark:bg-[#2e2118] border border-stone-200 dark:border-[#38271d] focus:outline-none focus:border-orange-500"
                     placeholder="250"
                   />
                 </div>
               </div>
+
+              {/* อัปโหลดไฟล์รูปภาพ */}
               <div>
-                <label className="block text-xs mb-1">ลิงก์ รูปภาพ (URL)</label>
-                <input
-                  type="url"
-                  value={newProduct.image}
-                  onChange={(e) =>
-                    setNewProduct({ ...newProduct, image: e.target.value })
-                  }
-                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-[#2a201a] border border-slate-200 dark:border-[#382b22] focus:outline-none focus:border-amber-500"
-                  placeholder="https://..."
-                />
+                <label className="block text-xs font-medium mb-1">อัปโหลดรูปภาพสินค้า</label>
+                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer bg-stone-50 dark:bg-[#2e2118] border-stone-300 dark:border-[#423023] hover:border-orange-500 transition-all relative overflow-hidden">
+                  {newProduct.image ? (
+                    <img
+                      src={newProduct.image}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-stone-400">
+                      <Upload className="w-6 h-6 mb-1 text-orange-500" />
+                      <p className="text-xs">คลิกเพื่อเลือกไฟล์รูปภาพจากเครื่อง</p>
+                      <p className="text-[10px]">PNG, JPG หรือ WEBP</p>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
               </div>
+
               <div>
-                <label className="block text-xs mb-1">รายละเอียดสินค้า</label>
+                <label className="block text-xs font-medium mb-1">รายละเอียดสินค้า</label>
                 <textarea
                   value={newProduct.description}
                   onChange={(e) =>
                     setNewProduct({ ...newProduct, description: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-[#2a201a] border border-slate-200 dark:border-[#382b22] focus:outline-none focus:border-amber-500 h-20"
+                  className="w-full p-2.5 rounded-lg bg-stone-50 dark:bg-[#2e2118] border border-stone-200 dark:border-[#38271d] focus:outline-none focus:border-orange-500 h-20"
                   placeholder="รายละเอียดเกี่ยวกับไซส์ หรือสภาพสินค้า..."
                 />
               </div>
               <button
                 type="submit"
-                className="w-full py-3 bg-amber-600 text-white font-semibold rounded-xl hover:bg-amber-500 transition-all shadow-md"
+                className="w-full py-3 bg-orange-600 text-white font-semibold rounded-xl hover:bg-orange-500 transition-all shadow-md"
               >
                 ลงขายสินค้า
               </button>
@@ -508,12 +547,13 @@ export default function MarketplacePage() {
         </div>
       )}
 
+      {/* Modal: ระบบจัดการสต็อก */}
       {isStockOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1e1713] border border-slate-200 dark:border-[#382b22] rounded-2xl max-w-lg w-full p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#2a201a] pb-2">
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <LayoutDashboard className="w-5 h-5 text-amber-500" />
+          <div className="bg-white dark:bg-[#231a14] border border-orange-100 dark:border-[#38271d] rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-stone-200 dark:border-[#2e2118] pb-2">
+              <h2 className="text-lg font-bold flex items-center gap-2 text-orange-600 dark:text-orange-500">
+                <LayoutDashboard className="w-5 h-5" />
                 จัดการสต็อกสินค้า
               </h2>
               <button onClick={() => setIsStockOpen(false)}>
@@ -524,7 +564,7 @@ export default function MarketplacePage() {
               {products.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between bg-slate-50 dark:bg-[#2a201a] p-3 rounded-xl border border-slate-200 dark:border-[#382b22]"
+                  className="flex items-center justify-between bg-stone-50 dark:bg-[#2e2118] p-3 rounded-xl border border-stone-200 dark:border-[#38271d]"
                 >
                   <div className="flex items-center gap-3">
                     <img
@@ -534,12 +574,12 @@ export default function MarketplacePage() {
                     />
                     <div>
                       <p className="text-xs font-semibold">{item.name}</p>
-                      <p className="text-[10px] text-amber-500">฿{item.price}</p>
+                      <p className="text-[10px] text-orange-600 dark:text-orange-400 font-bold">฿{item.price}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleDeleteProduct(item.id)}
-                    className="p-1.5 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                    className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

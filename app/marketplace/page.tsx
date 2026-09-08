@@ -7,13 +7,11 @@ import {
   Moon,
   Search,
   Shirt,
-  ShoppingBag,
-  LayoutDashboard,
   ShoppingCart,
+  LayoutDashboard,
   Tag,
 } from "lucide-react";
 
-// ข้อมูลจำลองรายการเสื้อผ้า
 const categories = [
   "ทั้งหมด",
   "เสื้อยืด",
@@ -100,7 +98,8 @@ export default function MarketplacePage() {
             {theme === "dark" ? (
               <Sun className="w-4 h-4" />
             ) : (
-              <Moon className="w-4 h-4" />}
+              <Moon className="w-4 h-4" />
+            )}
           </button>
         </div>
       </header>
@@ -141,7 +140,6 @@ export default function MarketplacePage() {
               className="bg-[#1e1713] border border-[#382b22] rounded-2xl overflow-hidden shadow-md hover:border-amber-700/50 transition-all flex flex-col justify-between"
             >
               <div>
-                {/* Product Image */}
                 <div className="relative w-full h-56 md:h-72 bg-[#120e0c] overflow-hidden group">
                   <img
                     src={product.image}
@@ -153,7 +151,6 @@ export default function MarketplacePage() {
                   </span>
                 </div>
 
-                {/* Product Info */}
                 <div className="p-3">
                   <h3 className="font-semibold text-sm line-clamp-1 text-[#f5e6d3]">
                     {product.name}
@@ -161,7 +158,6 @@ export default function MarketplacePage() {
                 </div>
               </div>
 
-              {/* Price & Action Button */}
               <div className="p-3 pt-0 flex items-center justify-between border-t border-[#2a201a] mt-2">
                 <span className="text-amber-500 font-bold text-base">
                   ฿{product.price}

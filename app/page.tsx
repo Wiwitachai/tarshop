@@ -1,69 +1,76 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
-import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { ShoppingBag, ArrowRight, Sun, Moon } from "lucide-react";
 
-export default function SplashScreen() {
+export default function LandingPage() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const shouldBeDark = savedTheme === "dark" || (!savedTheme && prefersDark);
+
+    setIsDarkMode(shouldBeDark);
+  }, []);
+
+  const toggleTheme = () => {
+    const nextState = !isDarkMode;
+    setIsDarkMode(nextState);
+    localStorage.setItem("theme", nextState ? "dark" : "light");
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-6 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
-      
-      {/* Top Tag */}
-      <div className="w-full flex justify-end pt-2">
-        <span className="text-xs px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-amber-500" /> TarShop Marketplace
-        </span>
-      </div>
-
-      {/* Main Logo & Hero Section */}
-      <div className="flex flex-col items-center text-center my-auto w-full max-w-sm">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative mb-6"
+    <div className={isDarkMode ? "dark" : ""}>
+      <div className="min-h-screen bg-[#fdfbf7] dark:bg-[#0f0b08] text-stone-800 dark:text-[#f4eae0] flex flex-col items-center justify-center p-4 relative transition-colors duration-300">
+        
+        {/* ปุ่มสลับโหมดกลางวัน/กลางคืน มุมขวาบน */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="absolute top-6 right-6 p-2.5 rounded-xl bg-orange-100/60 dark:bg-[#261910] text-orange-900 dark:text-orange-300 border border-orange-200/80 dark:border-[#3d2719] hover:bg-orange-200/60 dark:hover:bg-[#342216] transition-all cursor-pointer shadow-sm"
+          title="สลับโหมดกลางวัน/กลางคืน"
         >
-          <div className="w-24 h-24 rounded-3xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-            <ShoppingBag className="w-12 h-12 text-white" />
+          {mounted && isDarkMode ? (
+            <Sun className="w-5 h-5 text-amber-400" />
+          ) : (
+            <Moon className="w-5 h-5 text-orange-700" />
+          )}
+        </button>
+
+        {/* คอนเทนต์หลัก */}
+        <div className="flex flex-col items-center text-center max-w-sm space-y-6">
+          
+          {/* ไอคอนโลโก้วินเทจ */}
+          <div className="w-20 h-20 bg-orange-600 dark:bg-orange-700 rounded-3xl flex items-center justify-center shadow-lg shadow-orange-600/20 dark:shadow-none ring-4 ring-orange-200/50 dark:ring-orange-950/40">
+            <ShoppingBag className="w-10 h-10 text-amber-50" />
           </div>
-        </motion.div>
 
-        <motion.h1
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-4xl font-extrabold tracking-tight"
-        >
-          tar<span className="text-indigo-600 dark:text-indigo-400">shop</span>
-        </motion.h1>
+          {/* ชื่อแบรนด์ */}
+          <div className="space-y-2">
+            <h1 className="text-4xl font-extrabold tracking-tight font-serif">
+              <span className="text-stone-900 dark:text-stone-100">tar</span>
+              <span className="text-orange-600 dark:text-orange-500">shop</span>
+            </h1>
+            <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
+              ตลาดซื้อ-ขายสินค้าสำหรับชาววิทยาลัย ช้อปสะดวก ปลอดภัย ในรั้วเดียวกัน
+            </p>
+          </div>
 
-        <motion.p
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed"
-        >
-          ตลาดซื้อ-ขายสินค้าสำหรับชาววิทยาลัย ช้อปสะดวก ปลอดภัย ในรั้วเดียวกัน
-        </motion.p>
+          {/* ปุ่มเข้าสู่ระบบ / หน้าร้าน */}
+          <Link
+            href="/marketplace"
+            className="w-full mt-4 py-3.5 px-6 bg-orange-600 hover:bg-orange-700 dark:bg-orange-600 dark:hover:bg-orange-500 text-white font-semibold rounded-2xl shadow-md shadow-orange-600/25 dark:shadow-none flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 cursor-pointer"
+          >
+            <span>เข้าสู่ tarshop</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+
+        </div>
       </div>
-
-      {/* Action Button Area */}
-      <motion.div
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-        className="w-full max-w-sm pb-6"
-      >
-        <Link
-          href="/marketplace"
-          className="w-full py-4 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-semibold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 transition-all"
-        >
-          เข้าสู่ tarshop
-          <ArrowRight className="w-5 h-5" />
-        </Link>
-      </motion.div>
-
-    </main>
+    </div>
   );
 }
